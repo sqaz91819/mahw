@@ -19,7 +19,7 @@ namespace DE
     double b = 0.2;
     double c = 2 * PI;
     double scale = 0.5;
-    double reconbination_rate = 0.1;
+    double recombination_rate = 0.1;
 
     struct chromo
     {
@@ -36,7 +36,7 @@ namespace DE
     
     double ackley_function(chromo individual);          // fitness function
     auto mutation(vector<chromo> *population);
-    chromo reconbination(chromo v, chromo parent);        // like crossover
+    chromo recombination(chromo v, chromo parent);        // like crossover
     chromo selection(chromo v, chromo parent);
     auto DE_main(int runtimes, int iteration, int popsize);
 
@@ -59,10 +59,10 @@ namespace DE
     /*
     parameter : population pointer(?)
     return    : individual
-    process   : randomly select 3 individual and caculate new individual
+    process   : randomly select 3 individual and calculate new individual
     *setting scale function weight 0.8 or lower?
     mutation one dimension or all dimension?
-    maybe reconnination and selection in this function?
+    maybe recombination and selection in this function?
     */
     auto mutation(vector<chromo> &population) {
         uniform_int_distribution<int> distribution2 = uniform_int_distribution<int>(0, population.size() - 1);
@@ -78,7 +78,7 @@ namespace DE
                 v.xi.push_back(population.at(x1).xi[j] + scale * (population.at(x2).xi[j] - population.at(x3).xi[j]));
             }
 
-            v = reconbination(v, population.at(x1));
+            v = recombination(v, population.at(x1));
             v = selection(v, population.at(x1));
             Q.push_back(v);
             cout << i << ". current : " << v.current << endl;
@@ -88,14 +88,14 @@ namespace DE
     }
 
     /*
-    parameter : new individaul and parent
+    parameter : new individual and parent
     return    : new individual(after crossover with parent)
     process   : setting mutation rate, if i = j crossover
     */
-    chromo reconbination(chromo v, chromo parent) {
+    chromo recombination(chromo v, chromo parent) {
         int force = distribution3(generator);
         for( int i = 0; i < d; i++) {
-            if( ( i == force ) or distribution4(generator) < reconbination_rate)
+            if( ( i == force ) or distribution4(generator) < recombination_rate)
                 parent.xi[i] = v.xi[i];
         }
 
@@ -104,7 +104,7 @@ namespace DE
 
     /*
     parameter : new individual and parent
-    return    : survived individaul
+    return    : survived individual
     process   : compare with its parent and let better one survive
     */
     chromo selection(chromo v, chromo parent) {
@@ -146,6 +146,6 @@ namespace DE
 }
 
 int main() {
-    DE::DE_main(1,10,20);
+    DE::DE_main(1,100,20);
     return 0;
 }
