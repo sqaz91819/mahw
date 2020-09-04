@@ -19,7 +19,7 @@ namespace GA_clusting {
     double crossover_rate = 0.5;
     double kmeans_rate = 0.9;
     double mutation_rate = 0.01;
-    vector<int> M(150,1);    // record the number of compresstion data points
+    double bound = 0.8;
 
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     default_random_engine generator = default_random_engine(seed);
@@ -28,7 +28,7 @@ namespace GA_clusting {
 
     auto random_chromo();
     void crossover(iris::chromo &iris_set1, iris::chromo &iris_set2);
-    void mutation(iris::chromo &iris_set);
+    void mutation(iris::chromo &iris_set, vector<int> M);
     auto GA_clusting_main();
     auto init_random(iris::chromo &iris_set);
     auto init_kmeans(iris::chromo &iris_set);
@@ -54,9 +54,9 @@ namespace GA_clusting {
         }
     }
 
-    void mutation(iris::chromo &iris_set) {
+    void mutation(iris::chromo &iris_set, vector<int> M) {
         for(int i = 0; i < iris_set.iris_set.size(); i++)
-            if(distribution2(generator) < mutation_rate) {
+            if(distribution2(generator) < mutation_rate and M[i] != 0) {
                 short temp;
                 do{
                     temp = distribution1(generator);
@@ -66,18 +66,22 @@ namespace GA_clusting {
             }
     }
 
-    void cal_SSE(iris::chromo &iris_set)
+    void cal_SSE(iris::chromo &iris_set, vector<int> M)
     {
         vector<kmeans::core> cores(3, kmeans::core());
 
         // summation of iris info by group
+        int t1 = 0;
         for (auto irs : iris_set.iris_set)
         {
-            cores[irs.current_type - 1].petal_length += irs.petal_length;
-            cores[irs.current_type - 1].petal_width  += irs.petal_width;
-            cores[irs.current_type - 1].sepal_length += irs.sepal_length;
-            cores[irs.current_type - 1].sepal_width  += irs.sepal_width;
-            cores[irs.current_type - 1].total++;
+            if(M[t1] != 0 ) {
+                cores[irs.current_type - 1].petal_length += irs.petal_length * M[t1];
+                cores[irs.current_type - 1].petal_width  += irs.petal_width  * M[t1];
+                cores[irs.current_type - 1].sepal_length += irs.sepal_length * M[t1];
+                cores[irs.current_type - 1].sepal_width  += irs.sepal_width  * M[t1];
+                cores[irs.current_type - 1].total        += M[t1] ;
+            }
+            t1++;
         }
 
         // find centroid position
@@ -91,13 +95,18 @@ namespace GA_clusting {
 
         double SSE = 0;
         // cal SSE of this chromo
+        t1 = 0;
         for (auto irs : iris_set.iris_set)
         {
-            double d1 = pow(cores[irs.current_type - 1].petal_length - irs.petal_length, 2);
-            double d2 = pow(cores[irs.current_type - 1].petal_width  - irs.petal_width,  2);
-            double d3 = pow(cores[irs.current_type - 1].sepal_length - irs.sepal_length, 2);
-            double d4 = pow(cores[irs.current_type - 1].sepal_width  - irs.sepal_width,  2);
-            SSE += d1 + d2 + d3 + d4;
+            if(M[t1] != 0) {
+                double d1 = pow(cores[irs.current_type - 1].petal_length - irs.petal_length, 2);
+                double d2 = pow(cores[irs.current_type - 1].petal_width  - irs.petal_width,  2);
+                double d3 = pow(cores[irs.current_type - 1].sepal_length - irs.sepal_length, 2);
+                double d4 = pow(cores[irs.current_type - 1].sepal_width  - irs.sepal_width,  2);
+                SSE = SSE + (d1 + d2 + d3 + d4) * M[t1];
+            }
+
+            t1++;
         }
 
         iris_set.SSE = SSE;
@@ -141,12 +150,14 @@ namespace GA_clusting {
     auto GA_clusting_main()
     {
         vector<kmeans::iris> iris_set1 = iris_RW::read_iris();
+        vector<kmeans::iris> iris_backup(iris_set1);            // backup the original dataset
         vector<vector<double>> record;
 
         double total_acc = 0;
         for (int r = 0; r < runtimes; r++)
         {
-            kmeans::kmeans_main(iris_set1, 3);
+            vector<int> M(150,1);    // record the number of compresstion data points
+            //kmeans::kmeans_main(iris_set1, 3);
             vector<iris::chromo> population;
             for (int i = 0; i < popsize; i++)
             {
@@ -166,13 +177,17 @@ namespace GA_clusting {
                     vector<kmeans::core> cores(3, kmeans::core());
 
                     // summation of iris info by group
+                    int t1 = 0;
                     for (auto irs : population[i].iris_set)
                     {
-                        cores[irs.current_type - 1].petal_length += irs.petal_length;
-                        cores[irs.current_type - 1].petal_width  += irs.petal_width;
-                        cores[irs.current_type - 1].sepal_length += irs.sepal_length;
-                        cores[irs.current_type - 1].sepal_width  += irs.sepal_width;
-                        cores[irs.current_type - 1].total++;
+                        if(M[t1] != 0 ) {
+                            cores[irs.current_type - 1].petal_length += irs.petal_length * M[t1];
+                            cores[irs.current_type - 1].petal_width  += irs.petal_width  * M[t1];
+                            cores[irs.current_type - 1].sepal_length += irs.sepal_length * M[t1];
+                            cores[irs.current_type - 1].sepal_width  += irs.sepal_width  * M[t1];
+                            cores[irs.current_type - 1].total        += M[t1] ;
+                        }
+                        t1++;
                     }
 
                     // find centroid position
@@ -205,13 +220,18 @@ namespace GA_clusting {
 
                     double SSE = 0;
                     // cal SSE of this chromo
+                    t1 = 0;
                     for (auto irs : population[i].iris_set)
                     {
-                        double d1 = pow(cores[irs.current_type - 1].petal_length - irs.petal_length, 2);
-                        double d2 = pow(cores[irs.current_type - 1].petal_width  - irs.petal_width,  2);
-                        double d3 = pow(cores[irs.current_type - 1].sepal_length - irs.sepal_length, 2);
-                        double d4 = pow(cores[irs.current_type - 1].sepal_width  - irs.sepal_width,  2);
-                        SSE += d1 + d2 + d3 + d4;
+                        if(M[t1] != 0) {
+                            double d1 = pow(cores[irs.current_type - 1].petal_length - irs.petal_length, 2);
+                            double d2 = pow(cores[irs.current_type - 1].petal_width  - irs.petal_width,  2);
+                            double d3 = pow(cores[irs.current_type - 1].sepal_length - irs.sepal_length, 2);
+                            double d4 = pow(cores[irs.current_type - 1].sepal_width  - irs.sepal_width,  2);
+                            SSE = SSE + (d1 + d2 + d3 + d4) * M[t1];
+                        }
+
+                        t1++;
                     }
 
                     population[i].SSE = SSE;
@@ -252,15 +272,16 @@ namespace GA_clusting {
                     iris::chromo Pb = population[pb];
 
                     crossover(Pa, Pb);
-                    mutation(Pa);
-                    mutation(Pb);
-                    cal_SSE(Pa);
-                    cal_SSE(Pb);
+                    mutation(Pa, M);
+                    mutation(Pb, M);
+                    cal_SSE(Pa, M);
+                    cal_SSE(Pb, M);
                     population.push_back(Pa);
                     population.push_back(Pb);
                 }
 
                 // maintain next generation popsize
+                // select popsize from 2 * popsize
                 kth_sort(population, popsize);
                 vector<iris::chromo> p_temp;
                 for (int i = 0; i < popsize; i++)
@@ -268,6 +289,64 @@ namespace GA_clusting {
 
                 population = p_temp;
 
+                // compression and remove part
+                int total_zero = 0;
+                for(int i = 0; i < 150; i++) {
+                    if(M[i] == 0)
+                        total_zero++;
+                }
+
+                if(total_zero < bound * 150) {
+                    vector<kmeans::iris> central(3, kmeans::iris());
+                    vector<int> temp_m(3, 0);
+                    for( int i = 0; i < 150; i++) {
+                        bool compression = true;
+                        if(M[i] != 0) {
+                            for(int j = 0; j < popsize; j++) {
+                                if(population[0].iris_set[i].current_type != population[j].iris_set[i].current_type) {
+                                    compression = false;
+                                    break;
+                                }
+                            }
+
+                            if(compression) {
+                                int index = population[0].iris_set[i].current_type - 1;
+                                central[index].petal_length += iris_backup[i].petal_length * M[i];
+                                central[index].petal_width  += iris_backup[i].petal_width  * M[i];
+                                central[index].sepal_length += iris_backup[i].sepal_length * M[i];
+                                central[index].sepal_width  += iris_backup[i].sepal_width  * M[i];
+                                temp_m[index] += M[i];
+                                M[i] = 0;
+                            }
+                        }
+                    }
+
+                    for(int i = 0; i < 3; i++) {
+                        central[i].petal_length /= temp_m[i];
+                        central[i].petal_width  /= temp_m[i];
+                        central[i].sepal_length /= temp_m[i];
+                        central[i].sepal_width  /= temp_m[i];
+                        for(int j = 0; j < 150; j++) {
+                            if(iris_set1[j].current_type == i + 1 and M[j] == 0) {
+                                iris_set1[j].petal_length = central[i].petal_length;
+                                iris_set1[j].petal_width  = central[i].petal_width;
+                                iris_set1[j].sepal_length = central[i].sepal_length;
+                                iris_set1[j].sepal_width  = central[i].sepal_width;
+                                M[j] = temp_m[i];
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                for(auto pi : population) {
+                    for(auto it : pi.iris_set)
+                        cout << it.current_type << " ";
+
+                    cout << endl;
+                }
+
+                // accuracy recorder
                 double best = 0;
                 for (int i = 0; i < popsize; i++)
                 {

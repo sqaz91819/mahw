@@ -12,12 +12,12 @@ using namespace std;
 
 namespace kmeans{
     struct iris {
-        double sepal_length; // sepal = flower 2
-        double sepal_width;
-        double petal_length; // petal = flower 0.5
-        double petal_width;
-        short correct_type;  // just for caculate accuracy
-        short current_type;
+        double sepal_length = 0; // sepal = flower 2
+        double sepal_width  = 0;
+        double petal_length = 0; // petal = flower 0.5
+        double petal_width  = 0;
+        short correct_type  = 0;  // just for calculate accuracy
+        short current_type  = 0;
     };
 
     struct core {
@@ -27,7 +27,7 @@ namespace kmeans{
         double petal_width = 0;
         short type;
         int total = 0;
-        vector<iris> menmber;
+        vector<iris> member;
     };
 
     enum Type {
@@ -38,7 +38,7 @@ namespace kmeans{
 
     // 1. set k group
     // 2. random k type group core
-    // 3. caculate distance and assign to one group core
+    // 3. calculate distance and assign to one group core
     // 4. using data in one group core update new group core
     // 5. repeat 3.-5. until end condition or convergence
 
@@ -59,7 +59,7 @@ namespace kmeans{
 
     void clear_core(vector<core> &virtual_core) {
         for(auto & c : virtual_core)
-            c.menmber.clear();
+            c.member.clear();
     }
 
     void zero(iris &irs) {
@@ -91,30 +91,30 @@ namespace kmeans{
                 }
             }
 
-            virtual_core[irs.current_type-1].menmber.push_back(irs);
+            virtual_core[irs.current_type-1].member.push_back(irs);
         }
     }
 
     void re_core(vector<core> &virtual_core, vector<iris> iris_set) {
         for (auto &corea : virtual_core)
         {
-            if (corea.menmber.size() == 0)
+            if (corea.member.size() == 0)
             {
-                corea.menmber.push_back(iris_set[distribution3(generator)]);
+                corea.member.push_back(iris_set[distribution3(generator)]);
             }
 
             core temp;
-            for (auto irs : corea.menmber)
+            for (auto irs : corea.member)
             {
                 temp.petal_length += irs.petal_length;
                 temp.petal_width += irs.petal_width;
                 temp.sepal_length += irs.sepal_length;
                 temp.sepal_width += irs.sepal_width;
             }
-            corea.petal_length = temp.petal_length / corea.menmber.size();
-            corea.petal_width = temp.petal_width / corea.menmber.size();
-            corea.sepal_length = temp.sepal_length / corea.menmber.size();
-            corea.sepal_width = temp.sepal_width / corea.menmber.size();
+            corea.petal_length = temp.petal_length / corea.member.size();
+            corea.petal_width = temp.petal_width / corea.member.size();
+            corea.sepal_length = temp.sepal_length / corea.member.size();
+            corea.sepal_width = temp.sepal_width / corea.member.size();
         }
 
         for (int i = 0; i < k_group - 1; i++)
@@ -138,20 +138,20 @@ namespace kmeans{
         for(auto &irs : iris_set)
             irs.current_type = distribution1(generator);
 
-        vector<core> virtaul_core;
+        vector<core> virtual_core;
 
 
         for(int i = 0; i < k_group; i++) {
             core core;
             random_pos(core);
             core.type = i + 1;
-            virtaul_core.push_back(core);
+            virtual_core.push_back(core);
         }
 
         for(int i = 0 ; i < iteration; i++) {
-            set_group(iris_set, virtaul_core);
-            re_core(virtaul_core, iris_set);
-            clear_core(virtaul_core);
+            set_group(iris_set, virtual_core);
+            re_core(virtual_core, iris_set);
+            clear_core(virtual_core);
         }
     }
 
