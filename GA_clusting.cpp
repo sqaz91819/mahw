@@ -300,7 +300,9 @@ namespace GA_clusting {
 
 int main() {
     vector<vector<double>> temp;
+    clock_t c1 = clock();
     temp = GA_clusting::GA_clusting_main();
+    cout << "Time : " << clock() - c1 << endl;
     vector<double> output(GA_clusting::iteration, 0);
     for(int i = 0; i < GA_clusting::runtimes; i++) {
         for(int j = 0; j < GA_clusting::iteration; j++) {

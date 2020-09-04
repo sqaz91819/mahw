@@ -157,7 +157,7 @@ namespace GA_clusting {
         for (int r = 0; r < runtimes; r++)
         {
             vector<int> M(150,1);    // record the number of compresstion data points
-            //kmeans::kmeans_main(iris_set1, 3);
+            kmeans::kmeans_main(iris_set1, 3);
             vector<iris::chromo> population;
             for (int i = 0; i < popsize; i++)
             {
@@ -235,7 +235,7 @@ namespace GA_clusting {
                     }
 
                     population[i].SSE = SSE;
-                    cout << "SSE : " << population[i].SSE << endl;
+                    //cout << "SSE : " << population[i].SSE << endl;
                 }
 
                 vector<double> CDF(popsize, 0);
@@ -296,7 +296,16 @@ namespace GA_clusting {
                         total_zero++;
                 }
 
-                if(total_zero < bound * 150) {
+/*
+                for(auto pi : population) {
+                    for(auto it : pi.iris_set)
+                        cout << it.current_type;
+
+                    cout << endl;
+                }
+                */
+
+                if(total_zero < bound * 150 and z > 150) {
                     vector<kmeans::iris> central(3, kmeans::iris());
                     vector<int> temp_m(3, 0);
                     for( int i = 0; i < 150; i++) {
@@ -310,6 +319,12 @@ namespace GA_clusting {
                             }
 
                             if(compression) {
+                                /*
+                                for(int b = 0; b < popsize; b++) {
+                                    cout << population[b].iris_set[i].current_type;
+                                }
+                                */
+                                cout << endl;
                                 int index = population[0].iris_set[i].current_type - 1;
                                 central[index].petal_length += iris_backup[i].petal_length * M[i];
                                 central[index].petal_width  += iris_backup[i].petal_width  * M[i];
@@ -332,6 +347,12 @@ namespace GA_clusting {
                                 iris_set1[j].petal_width  = central[i].petal_width;
                                 iris_set1[j].sepal_length = central[i].sepal_length;
                                 iris_set1[j].sepal_width  = central[i].sepal_width;
+                                for(auto &pi : population) {
+                                    pi.iris_set[j].petal_length = central[i].petal_length;
+                                    pi.iris_set[j].petal_width  = central[i].petal_width;
+                                    pi.iris_set[j].sepal_length = central[i].sepal_length;
+                                    pi.iris_set[j].sepal_width  = central[i].sepal_width;
+                                }
                                 M[j] = temp_m[i];
                                 break;
                             }
@@ -339,12 +360,6 @@ namespace GA_clusting {
                     }
                 }
 
-                for(auto pi : population) {
-                    for(auto it : pi.iris_set)
-                        cout << it.current_type << " ";
-
-                    cout << endl;
-                }
 
                 // accuracy recorder
                 double best = 0;
@@ -379,7 +394,9 @@ namespace GA_clusting {
 
 int main() {
     vector<vector<double>> temp;
+    clock_t c1 = clock();
     temp = GA_clusting::GA_clusting_main();
+    cout << "Time : " << clock() - c1 << endl;
     vector<double> output(GA_clusting::iteration, 0);
     for(int i = 0; i < GA_clusting::runtimes; i++) {
         for(int j = 0; j < GA_clusting::iteration; j++) {
