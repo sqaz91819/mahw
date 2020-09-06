@@ -13,7 +13,7 @@ using namespace std;
 
 namespace GA_clusting {
 
-    int runtimes = 1;
+    int runtimes = 30;
     int iteration = 2000;
     double popsize = 20;
     double crossover_rate = 0.5;
@@ -215,7 +215,7 @@ namespace GA_clusting {
                     }
 
                     population[i].SSE = SSE;
-                    cout << "SSE : " << population[i].SSE << endl;
+                    //cout << "SSE : " << population[i].SSE << endl;
                 }
 
                 vector<double> CDF(popsize, 0);
@@ -302,7 +302,7 @@ int main() {
     vector<vector<double>> temp;
     clock_t c1 = clock();
     temp = GA_clusting::GA_clusting_main();
-    cout << "Time : " << clock() - c1 << endl;
+    cout << "Time : " << (clock() - c1) / 1000 << endl;
     vector<double> output(GA_clusting::iteration, 0);
     for(int i = 0; i < GA_clusting::runtimes; i++) {
         for(int j = 0; j < GA_clusting::iteration; j++) {

@@ -13,7 +13,7 @@ using namespace std;
 
 namespace GA_clusting {
 
-    int runtimes = 1;
+    int runtimes = 30;
     int iteration = 2000;
     double popsize = 20;
     double crossover_rate = 0.5;
@@ -305,7 +305,7 @@ namespace GA_clusting {
                 }
                 */
 
-                if(total_zero < bound * 150 and z > 150) {
+                if(total_zero < bound * 150 and z > 180) {
                     vector<kmeans::iris> central(3, kmeans::iris());
                     vector<int> temp_m(3, 0);
                     for( int i = 0; i < 150; i++) {
@@ -319,12 +319,6 @@ namespace GA_clusting {
                             }
 
                             if(compression) {
-                                /*
-                                for(int b = 0; b < popsize; b++) {
-                                    cout << population[b].iris_set[i].current_type;
-                                }
-                                */
-                                cout << endl;
                                 int index = population[0].iris_set[i].current_type - 1;
                                 central[index].petal_length += iris_backup[i].petal_length * M[i];
                                 central[index].petal_width  += iris_backup[i].petal_width  * M[i];
@@ -396,7 +390,7 @@ int main() {
     vector<vector<double>> temp;
     clock_t c1 = clock();
     temp = GA_clusting::GA_clusting_main();
-    cout << "Time : " << clock() - c1 << endl;
+    cout << "Time : " << (clock() - c1) / 1000 << endl;
     vector<double> output(GA_clusting::iteration, 0);
     for(int i = 0; i < GA_clusting::runtimes; i++) {
         for(int j = 0; j < GA_clusting::iteration; j++) {
