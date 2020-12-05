@@ -19,7 +19,7 @@ namespace TS
     private:
         
         int _maxbit = 0, _iteration = 0, _runtimes = 0, _length = 0;
-        int _best_reulst_value = 0;
+        int _best_result_value = 0;
 
         bool find(list<myList> tabu_list, myList target)
         {

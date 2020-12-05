@@ -64,7 +64,7 @@ namespace ANT
                 double distance = sqrt(
                     pow(ANT::coordination[j][0] - ANT::coordination[i][0], 2) + pow(ANT::coordination[j][1] - ANT::coordination[i][1], 2));
                 
-                if(!distance) distance = 9999;
+                if(!distance) distance = 999999;
                 ANT::dis_matrix[i][j] = distance;
                 ANT::inverse_dis[i][j] = 1 / distance;
             }

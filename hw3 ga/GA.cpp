@@ -25,7 +25,7 @@ namespace GA
         
 
         int _maxbit = 0, _iteration = 0, _runtimes = 0, _popsize = 0;
-        int _best_reulst_value = 0, _best_result_iteration = 0;
+        int _best_result_value = 0, _best_result_iteration = 0;
         const double mutation_rate = 0.77;
 
         vector<myList> return_kth_element(vector<myList> population, int k) {
@@ -217,15 +217,15 @@ namespace GA
         for (int j = 0; j < _runtimes; j++)
         {
             mylib mb("GA_rout" + to_string(j), 1);
-            _best_reulst_value = 0;
+            _best_result_value = 0;
             _best_result_iteration = 0;
             vector<myList> P = initialization();
             for (int i = 0; i < _iteration; i++)
             {
                 vector<int> CDF;
                 int temp = CDF_setter(CDF, P);
-                if (temp > _best_reulst_value) {
-                    _best_reulst_value = temp;
+                if (temp > _best_result_value) {
+                    _best_result_value = temp;
                     _best_result_iteration = i;
                 }
                 
@@ -242,11 +242,11 @@ namespace GA
                     Q.push_back(temp.Cb);
                 }
                 P = Q;
-                mb.adddata(i, _best_reulst_value);
+                mb.adddata(i, _best_result_value);
             }
             average_i += _best_result_iteration;
-            average_r += _best_reulst_value;
-            cout << "Best    : " << _best_reulst_value << endl;
+            average_r += _best_result_value;
+            cout << "Best    : " << _best_result_value << endl;
             cout << "Best it : " << _best_result_iteration << endl;
             // mb.outputdata();
             
@@ -262,15 +262,15 @@ namespace GA
         for (int j = 0; j < _runtimes; j++)
         {
             mylib mb("GA_tout" + to_string(j), 1);
-            _best_reulst_value = 0;
+            _best_result_value = 0;
             _best_result_iteration = 0;
             vector<myList> P = initialization();
             for (int i = 0; i < _iteration; i++)
             {
                 vector<int> CDF;
                 int temp = CDF_setter(CDF, P);
-                if (temp > _best_reulst_value) {
-                    _best_reulst_value = temp;
+                if (temp > _best_result_value) {
+                    _best_result_value = temp;
                     _best_result_iteration = i;
                 }
                 
@@ -287,11 +287,11 @@ namespace GA
                     Q.push_back(temp.Cb);
                 }
                 P = Q;
-                mb.adddata(i, _best_reulst_value);
+                mb.adddata(i, _best_result_value);
             }
             average_i += _best_result_iteration;
-            average_r += _best_reulst_value;
-            cout << "Best    : " << _best_reulst_value << endl;
+            average_r += _best_result_value;
+            cout << "Best    : " << _best_result_value << endl;
             cout << "Best it : " << _best_result_iteration << endl;
             // mb.outputdata();
         }
@@ -306,7 +306,7 @@ namespace GA
         for (int j = 0; j < _runtimes; j++)
         {
             mylib mb("GA_eout" + to_string(j), 1);
-            _best_reulst_value = 0;
+            _best_result_value = 0;
             _best_result_iteration = 0;
             vector<myList> P = initialization();
             for (int i = 0; i < _iteration; i++)
@@ -319,8 +319,8 @@ namespace GA
                         temp = evaluation(p);
                     }
                 }
-                if (temp > _best_reulst_value) {
-                    _best_reulst_value = temp;
+                if (temp > _best_result_value) {
+                    _best_result_value = temp;
                     _best_result_iteration = i;
                 }
                 
@@ -339,11 +339,11 @@ namespace GA
                     Q.push_back(temp.Cb);
                 }
                 P = Q;
-                mb.adddata(i, _best_reulst_value);
+                mb.adddata(i, _best_result_value);
             }
             average_i += _best_result_iteration;
-            average_r += _best_reulst_value;
-            cout << "Best    : " << _best_reulst_value << endl;
+            average_r += _best_result_value;
+            cout << "Best    : " << _best_result_value << endl;
             cout << "Best it : " << _best_result_iteration << endl;
             // mb.outputdata();
             

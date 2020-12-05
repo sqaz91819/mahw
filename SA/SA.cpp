@@ -18,7 +18,7 @@ namespace SA
     private:
         int _maxbit = 0, _iteration = 0, _runtimes = 0;
         double _temperature = 0;
-        int _best_reulst_value = 0;
+        int _best_result_value = 0;
 
         // random setting for reverse position
         myList random_bit()
@@ -121,12 +121,12 @@ namespace SA
             generator = default_random_engine(seed);
         }
 
-        SA(int maxbit, int iteration, int runtimes, double temprature)
+        SA(int maxbit, int iteration, int runtimes, double temperature)
         {
             _maxbit = maxbit;
             _iteration = iteration;
             _runtimes = runtimes;
-            _temperature = temprature;
+            _temperature = temperature;
             generator = default_random_engine(seed);
 
         }
