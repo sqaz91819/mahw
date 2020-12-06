@@ -1,5 +1,8 @@
 # Genetic Algorithm for Traveling Salesman Problem
 Using three different crossover methods of genetic algorithm to solve TSP problem.
+Testing data is from : http://elib.zib.de/pub/mp-testdata/tsp/tsplib/tsp/
+eil51.tsp
+
 ## Partially Mapped Crossover(PMX)
 1. Select two random number c1 and c2 (c1 <= c2).
 2. Exchange the genes from c1 to c2.

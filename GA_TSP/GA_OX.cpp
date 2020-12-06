@@ -229,7 +229,7 @@ namespace GA_PMX{
         }
     }
 
-    void OX_main(int iteration, int popsize) throw(){
+    void OX_main(int iteration=2000, int popsize=50) throw(){
         GA_PMX::popsize = popsize;
         read_coordination();
         cal_dismatrix();

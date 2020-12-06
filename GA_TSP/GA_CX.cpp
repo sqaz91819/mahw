@@ -167,6 +167,9 @@ namespace GA_PMX{
 
     }
 
+    /*
+      Select the best chromosome from the random choose individual.
+    */
     Solution Tournament_Selection(Solutions population, int size=2) {
         uniform_int_distribution<int> distribution(0, population.size()-1);
         int best = distribution(generator);
@@ -202,7 +205,7 @@ namespace GA_PMX{
         }
     }
 
-    void CX_main(int iteration, int popsize) throw(){
+    void CX_main(int iteration=2000, int popsize=50) throw(){
         GA_PMX::popsize = popsize;
         read_coordination();
         cal_dismatrix();
