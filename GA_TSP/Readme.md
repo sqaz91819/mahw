@@ -1,1 +1,7 @@
-# Genetic Algorithm for Traveling Salesman Problem with  partially mapped crossover(PMX)
+# Genetic Algorithm for Traveling Salesman Problem
+
+## Partially Mapped Crossover(PMX)
+
+## Order Crossover(OX)
+
+## Cycle Crossover(CX)
