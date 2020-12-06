@@ -1,4 +1,4 @@
-# Metaheuristic algorithms for specific problems(Max 0-1, TSP, clustering)
+# Metaheuristic algorithms for specific problems
 
 * Hill Climbing(HC) - Max 0-1
 * SA - Max 0-1

@@ -134,7 +134,6 @@ namespace GA_PMX{
         for(int i = c1; i <= c2; i++)
             swap(a[i], b[i]);
 
-        bool conflict = false;
         for(int i = 0; i < coordination.size(); i++){
             if(i < c1 or i > c2){
                 int j = c1, k = c1;
@@ -169,9 +168,7 @@ namespace GA_PMX{
         if(distribution(generator) < mutation_rate) {
             int c1 = distribution_i(generator);
             int c2 = distribution_i(generator);
-            int temp = sol.first[c1];
-            sol.first[c1] = sol.first[c2];
-            sol.first[c2] = temp;
+            swap(sol.first[c1], sol.first[c2]);
             sol.second = fitness(sol.first);
         }
 
@@ -188,6 +185,10 @@ namespace GA_PMX{
         return population[best];
     }
 
+    /*
+      Sort the first popsize of elements by the fitness order, these elements
+      will remain to next generation.
+    */
     void kth_sort(Solutions &population, int k)
     {
         for (int i = 0; i < k; i++)
@@ -216,8 +217,8 @@ namespace GA_PMX{
         int best = 99999;
         for(int i = 0; i < iteration; i++) {
             for(int j = 0; j < (popsize / 2); j++){
-                Solution Pa = Tournament_Selection(population);
-                Solution Pb = Tournament_Selection(population);
+                Solution Pa = Tournament_Selection(population, 3);
+                Solution Pb = Tournament_Selection(population, 3);
                 pair<Solution, Solution> temp = cross_over(Pa, Pb);
                 mutation(temp.first);
                 mutation(temp.second);
