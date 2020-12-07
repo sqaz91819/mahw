@@ -12,9 +12,8 @@ eil51.tsp
 
 ## Order Crossover(OX)
 1. Select two random number c1 and c2 (c1 <= c2).
-2. Fill the genes by opposite chromosome from c2+1 to c2 and check   
-   conflict with the original genes from c1 to c2. If conflict happened  
-   just skip this gene from opposite  and choose next candidate genes.
+2. Fill the genes by opposite chromosome from c2+1 to c2 and check conflict with the original genes from c1 to c2.  
+   If conflict happened just skip this gene from opposite  and choose next candidate genes.
    
 ## Cycle Crossover(CX)
 1. Select one random number c1 be the start point.
