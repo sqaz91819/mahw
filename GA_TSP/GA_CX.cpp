@@ -50,6 +50,7 @@ namespace GA_PMX{
             temp.push_back(y);
             GA_PMX::coordination.push_back(temp);
         }
+        file.close();
         
     }
 
@@ -205,12 +206,11 @@ namespace GA_PMX{
         }
     }
 
-    void CX_main(int iteration=2000, int popsize=50) throw(){
+    vector<double> CX_main(int iteration=2000, int popsize=50) throw(){
+        double best = 99999;
+        vector<double> best_record(iteration, 0);
         GA_PMX::popsize = popsize;
-        read_coordination();
-        cal_dismatrix();
         Solutions population = init_population();
-        int best = 99999;
         for(int i = 0; i < iteration; i++) {
             for(int j = 0; j < (popsize / 2); j++){
                 Solution Pa = Tournament_Selection(population, 2);
@@ -224,10 +224,11 @@ namespace GA_PMX{
             kth_sort(population, popsize);
             if(population[0].second < best)
                 best = population[0].second;
+            best_record[i] = best;
             population = Solutions(population.begin(), population.begin()+popsize);
-            cout << "Best fitness : " << best << endl;
+            // cout << "Best fitness : " << best << endl;
         }
-    
+        return best_record;
     }
 
     void print_sol(Trail trail) {
@@ -237,9 +238,34 @@ namespace GA_PMX{
         }
         cout << endl;
     }
+
+    void run_output(string file_name, vector<double> record) {
+        ofstream file;
+        file.open(file_name);
+        for(int i = 0; i < record.size(); i++)
+            file << i * popsize << " " << record[i] << endl;
+    }
 }; // namespace GA_PMX
 
 int main(int argc, char *argv[]){
-    GA_PMX::CX_main(2000, 50);
+    int runtimes = 30;
+    int iteration = 2000;
+    int popsize = 50;
+    GA_PMX::read_coordination();
+    GA_PMX::cal_dismatrix();
+    vector<double> run_record(iteration, 0);
+    for(int i = 0; i < runtimes; i++) {
+        vector<double> record = GA_PMX::CX_main(iteration, popsize);
+        for(int j = 0; j < iteration; j++)
+            run_record[j] += record[j];
+        cout << "runtimes " << i << endl;
+    }
+
+    for(int i = 0; i < iteration; i++) {
+        run_record[i] = run_record[i] / runtimes;
+        cout << run_record[i] << endl;
+    }
+    
+    GA_PMX::run_output( "CX.txt", run_record);
     return 0;
-}
+} // main

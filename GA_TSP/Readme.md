@@ -22,4 +22,7 @@ eil51.tsp
 4. Fill the other genes from opposite chromosome which has not been filled.
 
 ## Experimental result
-... 
+![Alt text](.\figures\TSP_GA_convergence.png)
+Runtimes : 30
+Popsize  : 50
+Iteration : 2000

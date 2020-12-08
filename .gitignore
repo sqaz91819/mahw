@@ -1,7 +1,6 @@
 *.txt
 *.exe
 *.json
-*.png
 *.zip
 *out*
 *.py
