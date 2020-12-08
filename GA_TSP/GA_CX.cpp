@@ -134,6 +134,7 @@ namespace GA_PMX{
             n_a[i] = a[i];
             i = b[i];
         }
+
         for(i = 0; i < coordination.size(); i++)
             if(n_a[i] == -1) n_a[i] = b[i];
 
@@ -141,12 +142,11 @@ namespace GA_PMX{
 
         while(n_b[i] == -1) {
             n_b[i] = b[i];
-            i = a[i];
+            i = n_a[i];
         }
+
         for(i = 0; i < coordination.size(); i++)
-            if(n_b[i] == -1) n_b[i] = a[i];
-
-
+            if(n_b[i] == -1) n_b[i] = n_a[i];
 
         Pa.first = n_a;
         Pb.first = n_b;
@@ -232,7 +232,8 @@ namespace GA_PMX{
 
     void print_sol(Trail trail) {
         for(auto t : trail) {
-            cout << t << " ";
+            if(t < 10 and t >= 0) cout << " " << t << " ";
+            else cout << t << " ";
         }
         cout << endl;
     }

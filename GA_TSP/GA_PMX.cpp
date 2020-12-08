@@ -229,7 +229,7 @@ namespace GA_PMX{
             if(population[0].second < best)
                 best = population[0].second;
             population = Solutions(population.begin(), population.begin()+popsize);
-            cout << "Best fitness : " << best << endl;
+            // cout << "Best fitness : " << best << endl;
         }
     
     }
