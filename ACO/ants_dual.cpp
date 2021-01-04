@@ -8,7 +8,6 @@
 #include <cmath>
 #include <unordered_map>
 #include <ctime>
-#include "test.h"
 
 #define SIZE 51
 
@@ -251,7 +250,7 @@ namespace ANT
         }
     }
 
-    void update_pheromones(vector<pair<vector<int>, double>> Population, pair<vector<int>, double> cur_best) {
+    void update_pheromones(vector<pair<vector<int>, double>> Population, vector<pair<vector<int>, double>> Population1, pair<vector<int>, double> cur_best, double rate) {
         for(auto &i : p)
             for( auto &j : i)
                 if(j >= 1.0e-290) j *= (1-beta);  // if statement to avoid double underflow -> NaN
@@ -265,6 +264,17 @@ namespace ANT
                 p[i.first[j+1]][i.first[j]] = p[i.first[j]][i.first[j+1]];
             }
             p[i.first[SIZE-1]][i.first[0]] += beta * Lk;
+            p[i.first[0]][i.first[SIZE-1]] = p[i.first[SIZE-1]][i.first[0]];
+        }
+
+        for( auto i : Population1) {
+            double Lk = 1 / i.second;
+            for (int j = 0; j < i.first.size() - 1; j++)
+            {
+                p[i.first[j]][i.first[j+1]] += beta * Lk * 0.1;
+                p[i.first[j+1]][i.first[j]] = p[i.first[j]][i.first[j+1]];
+            }
+            p[i.first[SIZE-1]][i.first[0]] += beta * Lk * 0.1;
             p[i.first[0]][i.first[SIZE-1]] = p[i.first[SIZE-1]][i.first[0]];
         }
 
@@ -286,6 +296,57 @@ namespace ANT
         for(int i = 0; i < SIZE; i++)
             for(int j = 0; j < SIZE; j++)
                 pheXdis[i][j] = p[i][j] * pow(inverse_dis[i][j], alpha);
+
+    }
+
+    void update_pheromones1(vector<pair<vector<int>, double>> Population, vector<pair<vector<int>, double>> Population1, pair<vector<int>, double> cur_best, double rate) {
+        for(auto &i : p)
+            for( auto &j : i)
+                if(j >= 1.0e-290) j *= (1-beta);  // if statement to avoid double underflow -> NaN
+
+        // update all ants trail
+        for( auto i : Population) {
+            double Lk = 1 / i.second;
+            for (int j = 0; j < i.first.size() - 1; j++)
+            {
+                p1[i.first[j]][i.first[j+1]] += beta * Lk;
+                p1[i.first[j+1]][i.first[j]] = p1[i.first[j]][i.first[j+1]];
+            }
+            p1[i.first[SIZE-1]][i.first[0]] += beta * Lk;
+            p1[i.first[0]][i.first[SIZE-1]] = p1[i.first[SIZE-1]][i.first[0]];
+        }
+
+        for( auto i : Population1) {
+            double Lk = 1 / i.second;
+            for (int j = 0; j < i.first.size() - 1; j++)
+            {
+                p1[i.first[j]][i.first[j+1]] += beta * Lk * 0.1;
+                p1[i.first[j+1]][i.first[j]] = p1[i.first[j]][i.first[j+1]];
+            }
+            p1[i.first[SIZE-1]][i.first[0]] += beta * Lk * 0.1;
+            p1[i.first[0]][i.first[SIZE-1]] = p1[i.first[SIZE-1]][i.first[0]];
+        }
+
+        for (auto &i : p1)
+            for (auto &j : i)
+                if (j >= 1.0e-290) j *= (1 - tao); // if statement to avoid double underflow -> NaN
+
+        // update the trail of current best ant
+        double temp = cur_best.second;
+        for(int i = 0; i < SIZE-1; i++) {
+            p1[cur_best.first[i]][cur_best.first[i+1]] += tao * temp;
+            p1[cur_best.first[i+1]][cur_best.first[i]] = p1[cur_best.first[i]][cur_best.first[i+1]];
+        }
+
+        p1[cur_best.first[SIZE-1]][cur_best.first[0]] += tao * temp;
+        p1[cur_best.first[0]][cur_best.first[SIZE-1]] = p1[cur_best.first[SIZE-1]][cur_best.first[0]];
+
+        // update temp for pheromenes * inverse distance
+        for(int i = 0; i < SIZE; i++)
+            for(int j = 0; j < SIZE; j++)
+                pheXdis1[i][j] = p1[i][j] * pow(inverse_dis[i][j], 7);
+
+        //!!!!!!!!!!
 
     }
 
@@ -328,15 +389,12 @@ namespace ANT
         } while (change > 0);
     }
 
-    pair<vector<int>, double> greedy_ant() {
-
-    }
-
     auto ACO_main(int runtimes, int iteration, int popsize)
     {
         read_coordination();
         cal_dismatrix();
         double total = 0;
+        double total1 = 0;
         vector<pair<vector<int>, double>> best_update_record;
         pair<vector<int>, double> global_best({vector<int>(0),9999});
         vector<double> iteration_average(iteration, 0);
@@ -352,8 +410,12 @@ namespace ANT
                 {
                     pair<vector<int>, double> s = construct_ant();
                     pair<vector<int>, double> s1 = construct_ant1();
-                    if( s.second < cur_best.second ) {
+                    if( s.second < s1.second and s.second < cur_best.second ) {
                         cur_best = s;
+                        best_update_record.push_back(cur_best);
+                    }
+                    else if( s1.second < s.second and s1.second < cur_best.second ) {
+                        cur_best = s1;
                         best_update_record.push_back(cur_best);
                     }
                     Population.push_back(s);
@@ -367,7 +429,8 @@ namespace ANT
                 }
                 */
                 iteration_average[j] += cur_best.second;
-                update_pheromones(Population, cur_best);
+                update_pheromones(Population, Population1, cur_best, 0.9);
+                update_pheromones1(Population1, Population, cur_best, 0.9);
 
                 // record whole runtimes best
                 if(cur_best.second < global_best.second)
@@ -392,7 +455,7 @@ parameter 1. runtimes 2. iteration 3. popsize
 int main(int argc, char *argv[]) {
     int runtimes = 30;
     int iteration = 350;
-    int popsize = 50;
+    int popsize = 25;
     if(argc > 3) {
         runtimes = std::stoi(argv[1]);
         iteration = std::stoi(argv[2]);
